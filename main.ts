@@ -99,8 +99,12 @@ async function getArticle() {
 async function main() {
 	let article = await getArticle();
 
-	if (article.startsWith("html```") && article.endsWith("```")) {
+	if (article.startsWith("```html") && article.endsWith("```")) {
 		article = article.slice(7, article.length - 3);
+	}
+
+	if (!(article.startsWith("<article>") && article.endsWith("</article>"))) {
+		throw new Error("Received article format is wrong");
 	}
 
 	const template = await Deno.readTextFile("template.html");
@@ -111,6 +115,12 @@ async function main() {
 		"preview.html",
 		templateFirst + "\n\n" + article + "\n\n    </body>" + templateSecond,
 	);
+
+	const formattingCommand = new Deno.Command("deno", {
+		args: ["fmt", "./preview.html"],
+	});
+
+	await formattingCommand.output();
 }
 
 main();
