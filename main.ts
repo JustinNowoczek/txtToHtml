@@ -1,4 +1,4 @@
-import { OpenAI } from "https://deno.land/x/openai@v4.68.1/mod.ts";
+import OpenAI from "https://deno.land/x/openai@v4.68.1/mod.ts";
 import createAndFormatHtml from "./helpers/createAndFormatHtml.ts";
 import exitIfUndefined from "./helpers/exitIfUndefined.ts";
 import getArticle from "./helpers/getArticle.ts";
