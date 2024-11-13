@@ -1,6 +1,6 @@
 # Text to HTML Converter
 
-Takes the content of a remote/local text file and transforms it into an HTML web page.
+Takes the content of a remote/local text file and transforms it into an HTML web page. `podglad.html` is just an example output.
 
 ## Getting Started
 
