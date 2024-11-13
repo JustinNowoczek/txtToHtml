@@ -42,4 +42,16 @@ async function getSampleText() {
 	return "Placeholder string";
 }
 
-getSampleText().then((d) => console.log(d.slice(0, 20)));
+async function main() {
+	const key = Deno.env.get("OPENAI_API_KEY");
+
+	if (key === undefined) {
+		throw new Error(
+			"No api key detected, add one under the name OPENAI_API_KEY to a .env file",
+		);
+	}
+
+	const text = await getSampleText();
+}
+
+main();
