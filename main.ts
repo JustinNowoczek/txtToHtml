@@ -44,7 +44,7 @@ async function getSampleText() {
 	return "Placeholder string";
 }
 
-async function getArticleBody() {
+async function getArticle() {
 	const key = Deno.env.get("OPENAI_API_KEY");
 
 	if (key === undefined) {
@@ -60,13 +60,13 @@ async function getArticleBody() {
 	});
 
 	const completion = await openai.chat.completions.create({
-		model: "gpt-4-turbo",
+		model: "chatgpt-4o-latest",
 		messages: [
 			{
 				role: "system",
 				content:
-					`Create valid html, starting with an Article tag, with nothing outside of the tags. Use only the text provided 
-					by the user, without adding any of your own content or formatting. The only thing you are allowed to add are images, where suitable. 
+					`Create valid html, starting with an article tag, with nothing outside of the tags. Use only the text provided 
+					by the user, without adding any of your own content. The only thing you are allowed to add are images, where suitable. 
 					Every img will be inside the figure tag, and is required to have 
 					image_placeholder.jpg as the src attribute, it is also required to have the alt 
 					attribute, which is a prompt of a relevant image, that would be used in an image 
@@ -89,13 +89,28 @@ async function getArticleBody() {
 		throw new Error("The LLM did not finish generating successfully");
 	}
 
+	if (typeof completion.choices[0].message.content !== "string") {
+		throw new Error("The LLM did not respond with text");
+	}
+
 	return completion.choices[0].message.content;
 }
 
 async function main() {
-	const body = await getArticleBody();
+	let article = await getArticle();
 
-	console.log(body);
+	if (article.startsWith("html```") && article.endsWith("```")) {
+		article = article.slice(7, article.length - 3);
+	}
+
+	const template = await Deno.readTextFile("template.html");
+
+	const [templateFirst, templateSecond] = template.split("</body>");
+
+	await Deno.writeTextFile(
+		"preview.html",
+		templateFirst + "\n\n" + article + "\n\n    </body>" + templateSecond,
+	);
 }
 
 main();
