@@ -1,23 +1,17 @@
 import { OpenAI } from "https://deno.land/x/openai@v4.68.1/mod.ts";
 import createAndFormatHtml from "./helpers/createAndFormatHtml.ts";
+import exitIfUndefined from "./helpers/exitIfUndefined.ts";
 import getArticle from "./helpers/getArticle.ts";
 import getTextFromApi from "./helpers/getTextFromApi.ts";
 import getTextFromFile from "./helpers/getTextFromFile.ts";
 
-function exitIfUndefined<T>(
-	v: T | undefined,
-	...msgs: string[]
-): asserts v is T {
-	const allMsgs = [...msgs, "Exiting"];
+const userArgs = Deno.args;
 
-	if (v === undefined) {
-		allMsgs.forEach((msg) => {
-			console.error(msg);
-		});
-
-		Deno.exit(1);
-	}
-}
+const DEFAULTS = [
+	"podglad",
+	"https://cdn.oxido.pl/hr/Zadanie%20dla%20JJunior%20AI%20Developera%20-%20tresc%20artykulu.txt",
+	"./data/backupContent.txt",
+];
 
 async function main(
 	previewName: string,
@@ -67,7 +61,7 @@ async function main(
 
 	console.log("\nArticle validated\n");
 
-	const template = await getTextFromFile("./data/template.html");
+	const template = await getTextFromFile("./data/szablon.html");
 
 	exitIfUndefined(template);
 
@@ -82,15 +76,13 @@ async function main(
 	Deno.exit(0);
 }
 
-const DEF_PREVIEW_NAME = "preview";
-const DEF_CONTENT_URL =
-	"https://cdn.oxido.pl/hr/Zadanie%20dla%20JJunior%20AI%20Developera%20-%20tresc%20artykulu.txt";
-const DEF_BACKUP_CONTENT_PATH = "./data/backupContent.txt";
+const replaceEOrU = (v: string, d: string) =>
+	v === "!" || v === undefined ? d : v;
 
-const [
-	previewName = DEF_PREVIEW_NAME,
-	contentUrl = DEF_CONTENT_URL,
-	backupContentPath = DEF_BACKUP_CONTENT_PATH,
-] = Deno.args;
+const userOrDefaultArgs: [string, string, string] = [
+	replaceEOrU(userArgs[0], DEFAULTS[0]),
+	replaceEOrU(userArgs[1], DEFAULTS[1]),
+	replaceEOrU(userArgs[2], DEFAULTS[2]),
+];
 
-main(previewName, contentUrl, backupContentPath);
+main(...userOrDefaultArgs);
