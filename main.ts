@@ -18,6 +18,8 @@ async function getSampleText() {
 
 		const data = await res.text();
 
+		console.log("Read succeeded");
+
 		return data;
 	} catch (e) {
 		console.error(
@@ -31,6 +33,8 @@ async function getSampleText() {
 		console.log("Attempting local file read");
 
 		const data = await Deno.readTextFile("backup.txt");
+
+		console.log("Read succeeded");
 
 		return data;
 	} catch (e) {
@@ -55,9 +59,15 @@ async function getArticle() {
 
 	const text = await getSampleText();
 
+	console.log("Attempting communication with api");
+
 	const openai = new OpenAI({
 		apiKey: key,
 	});
+
+	console.log("Api key is valid");
+
+	console.log("Prompting LLM");
 
 	const completion = await openai.chat.completions.create({
 		model: "chatgpt-4o-latest",
@@ -81,6 +91,8 @@ async function getArticle() {
 		],
 	});
 
+	console.log("LLM responded");
+
 	if (completion.choices.length === 0) {
 		throw new Error("The LLM did not respond with content");
 	}
@@ -103,11 +115,17 @@ async function main() {
 		article = article.slice(7, article.length - 3);
 	}
 
+	article = article.trim();
+
+	console.log(article);
+
 	if (!(article.startsWith("<article>") && article.endsWith("</article>"))) {
 		throw new Error("Received article format is wrong");
 	}
 
 	const template = await Deno.readTextFile("template.html");
+
+	console.log("Read template file");
 
 	const [templateFirst, templateSecond] = template.split("</body>");
 
@@ -116,11 +134,15 @@ async function main() {
 		templateFirst + "\n\n" + article + "\n\n    </body>" + templateSecond,
 	);
 
+	console.log("Created preview file");
+
 	const formattingCommand = new Deno.Command("deno", {
 		args: ["fmt", "./preview.html"],
 	});
 
 	await formattingCommand.output();
+
+	console.log("Formatted preview file");
 }
 
 main();
