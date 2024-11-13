@@ -1,8 +1,8 @@
 import { OpenAI } from "https://deno.land/x/openai@v4.68.1/mod.ts";
-import createAndFormatHtml from "./createAndFormatHtml.ts";
-import getArticle from "./getArticle.ts";
-import getTextFromApi from "./getTextFromApi.ts";
-import getTextFromFile from "./getTextFromFile.ts";
+import createAndFormatHtml from "./helpers/createAndFormatHtml.ts";
+import getArticle from "./helpers/getArticle.ts";
+import getTextFromApi from "./helpers/getTextFromApi.ts";
+import getTextFromFile from "./helpers/getTextFromFile.ts";
 
 function exitIfUndefined<T>(
 	v: T | undefined,
@@ -67,7 +67,7 @@ async function main(
 
 	console.log("\nArticle validated\n");
 
-	const template = await getTextFromFile("./template.html");
+	const template = await getTextFromFile("./data/template.html");
 
 	exitIfUndefined(template);
 
@@ -85,7 +85,7 @@ async function main(
 const DEF_PREVIEW_NAME = "preview";
 const DEF_CONTENT_URL =
 	"https://cdn.oxido.pl/hr/Zadanie%20dla%20JJunior%20AI%20Developera%20-%20tresc%20artykulu.txt";
-const DEF_BACKUP_CONTENT_PATH = "./backup.txt";
+const DEF_BACKUP_CONTENT_PATH = "./data/backupContent.txt";
 
 const [
 	previewName = DEF_PREVIEW_NAME,
